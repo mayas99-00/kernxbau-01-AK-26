@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز قرار تأجير الآلات - KERNX BAU UG | مشروع Wolfsburg FTTH</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0f172a',
+                        },
+                        accent: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        success: {
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+        }
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.75);
+        }
+    </style>
+</head>
+<!-- Color Palette Selected: Deep Sapphire Navy (#0F172A), Industrial Amber (#F59E0B), Cyan Blue (#0284C7), Emerald (#10B981) -->
+<!-- 
+NARRATIVE & STRUCTURE PLAN:
+1. Corporate Header & Project Context Banner: KERNX BAU UG legal entity details, Wolfsburg FTTH project parameters, transport distance (180 km total).
+2. Key Commercial Metric & Subcontractor Indicator: Real-time Deckungsbeitrag calculator linked to LV Einheitspreis 14,80 €/m and personal_katalog.html#deckungsbeitrag.
+3. Equipment Rental Comparison Table (4 Main Required Machines): MN-Baumaschinen vs Market Average vs KERNX Target Price.
+4. Interactive Multi-Variable Rental & Transport Cost Calculator: Real-time net/vat/gross, cost per day, cost per meter.
+5. Analytical Visualizations: Chart 1 (Cost comparison), Chart 2 (Cost Breakdown Donut), Chart 3 (Productivity m/Day vs Cost/m curve).
+6. Primary Supplier Dossier (MN-Baumaschinen Vermietung): Profile, Kleinanzeigen ratings, response time, and active listings matrix with filtering.
+7. Spare Parts Section (Ersatzteile): Listed Kubota chains and Kramer window glasses.
+8. Follow-up Action Hub & Modal: Nachfass-Anfrage generator with copy function for Kleinanzeigen/Email.
+-->
+<!--
+CONFIRMATION:
+- NO SVG graphics used anywhere in this file. Emojis, styled text, HTML/CSS layout, and Canvas (Chart.js) are used exclusively.
+- NO Mermaid JS used.
+- All Chart.js string labels > 16 characters are wrapped into arrays.
+- Chart.js tooltip configuration callback is strictly included in options.
+-->
+<body class="bg-slate-900 text-slate-100 font-sans leading-relaxed pb-12">
+
+    <!-- Header Navigation & Company Context -->
+    <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-amber-500 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded tracking-wider uppercase">KERNX BAU UG</span>
+                    <span class="text-xs text-slate-400 font-mono">HRB 231210 · Hannover</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-black text-white mt-1">مركز قرار تأجير الآلات - مشروع Wolfsburg (FTTH)</h1>
+                <p class="text-xs text-slate-400">تقييم عروض المورّدين، مقارنة السوق المحلي، وتحليل تكلفة المتر لافتتاح المشروع في 01.10</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 no-print">
+                <button onclick="openModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition shadow flex items-center gap-1.5">
+                    <span>📩</span> Nachfass-Anfrage (متابعة العرض)
+                </button>
+                <a href="#calculator" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 rounded-lg transition flex items-center gap-1">
+                    <span>🧮</span> الحاسبة
+                </a>
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs sm:text-sm px-3 py-2 rounded-lg font-medium transition">
+                    <span>🖨️</span> طباعة
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
+
+        <!-- Business Context & Project Framework Banner -->
+        <section class="bg-slate-800/80 rounded-2xl p-6 border border-slate-700 shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2 border-l border-slate-700/60 pl-4 md:pl-0 md:border-l-0">
+                    <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">بيانات المقاول والجهة الفنية</div>
+                    <div class="text-sm font-semibold text-white">KERNX BAU UG (haftungsbeschränkt)</div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <p>📍 Deisterstraße 30, 30449 Hannover</p>
+                        <p>✉️ contact@kernxbau.de | 📞 +49 176 84786729</p>
+                        <p>🌐 kernxbau.de</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 border-l border-slate-700/60 pl-4 md:pl-0 md:border-l-0">
+                    <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">بيانات العقد والمشروع</div>
+                    <div class="text-sm font-semibold text-white">Leitungsbau / Kabeltiefbau in Wolfsburg</div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <p>⏱️ بداية العمل: <span class="text-white font-mono font-bold">01.10.2026</span> (المدة: شهر قابل للتمديد)</p>
+                        <p>🚛 مسافة النقل: Hannover ↔ Wolfsburg ≈ 90 km (180 km ذهاب وإياب)</p>
+                        <p>📋 العقد المرجعي: <span class="text-sky-300 font-mono">NU-LV Tiefbau FTTH Wolfsburg (18.08.2026)</span></p>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">طبيعة التعاقد والأثر المالي</div>
+                    <div class="text-sm font-semibold text-sky-400">مقاول من الباطن (Nachunternehmer - NU)</div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        الإيرادات محددة سلفاً بأسعار وحدة ثابته (<span class="font-mono text-amber-300">Einheitspreise</span>) مع الشركة العامة (AG - Langenhagen). <strong class="text-white">كل يورو يتم توفيره في إيجار أو نقل الآلات يذهب مباشرة إلى هامش الربح الإجمالي (Deckungsbeitrag).</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI Metrics Grid & LV Base Reference Rates -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div class="text-xs text-slate-400 font-medium">حفر كابلات (Kabelgraben)</div>
+                <div class="text-xl font-black text-amber-400 font-mono mt-1">14,80 € / m</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">سعر الوحدة المرجعي في الـ LV</div>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div class="text-xs text-slate-400 font-medium">دفع هيدروليكي Pressung DA90</div>
+                <div class="text-xl font-black text-sky-400 font-mono mt-1">31,00 € / m</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">سعر المقاولة من الباطن</div>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div class="text-xs text-slate-400 font-medium">دفع هيدروليكي Pressung DA125</div>
+                <div class="text-xl font-black text-sky-400 font-mono mt-1">33,00 € / m</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">سعر المقاولة من الباطن</div>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div class="text-xs text-slate-400 font-medium">وصلات منازل (Hausanschluss)</div>
+                <div class="text-xl font-black text-emerald-400 font-mono mt-1">315,00 €</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">لكل وصلة حتى 8 أمتار</div>
+            </div>
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <div class="text-xs text-slate-400 font-medium">ساعة عمل أشغال عامة (Tiefbau)</div>
+                <div class="text-xl font-black text-indigo-400 font-mono mt-1">29,50 € / h</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">سعر الساعة المعتمد بالـ LV</div>
+            </div>
+        </section>
+
+        <!-- Subcontractor Core Metric Widget: Maschinenkosten je Meter -->
+        <section class="bg-gradient-to-r from-sky-950 via-slate-900 to-slate-900 p-6 rounded-2xl border border-sky-800/60 shadow-xl">
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <div>
+                    <span class="bg-sky-500 text-slate-950 text-xs font-bold px-2.5 py-0.5 rounded">مؤشر أداء الربحية المباشرة</span>
+                    <h2 class="text-lg font-bold text-white mt-1">تكلفة الآلات لكل متر طولي (Maschinenkosten je Meter)</h2>
+                    <p class="text-xs text-slate-300">طريقة الحساب: <span class="font-mono text-sky-300">Maschinenkosten je Meter = تكلفة الآلات اليومية (شاملة النقل) ÷ الإنتاجية (m/Tag)</span></p>
+                </div>
+                <a href="personal_katalog.html#deckungsbeitrag" target="_blank" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-sky-300 font-bold text-xs px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <span>🔗</span> ربط مع ملف العمال (Personal Catalog)
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">معدل الإنجاز اليومي المخطط (m/Tag):</label>
+                    <input type="number" id="meter-performance" value="40" min="10" max="150" oninput="updateMeterMetric()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-amber-400 font-mono font-bold focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 mb-1">تكلفة طقم الآلات اليومية التقديرية:</div>
+                    <div class="text-lg font-mono font-bold text-white" id="metric-daily-cost">125.00 € / Tag</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 mb-1">حصة الآلات من إيراد المتر (14,80 €):</div>
+                    <div class="text-lg font-mono font-black text-sky-400" id="metric-cost-per-meter">3.13 € / m</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 mb-1">المتبقي لهامش الربح والعمالة (Rest-DB):</div>
+                    <div class="text-lg font-mono font-black text-emerald-400" id="metric-remaining-db">11.68 € / m</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Required Equipment Pricing & Comparison Table -->
+        <section class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-lg">
+            <div class="p-6 bg-slate-950 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white">جدول أسعار ومقارنة الآلات الأربع المطلوبة لمشروع Wolfsburg</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">مقارنة بين تسعير MN-Baumaschinen المعلن، متوسط السوق في هانوفر، والسعر المستهدف لشراكة KERNX BAU</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-mono px-2.5 py-1 rounded-md">
+                        Listenpreis Kleinanzeigen · Tagesmiete (angenommen) · netto (unbestätigt)
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-4 bg-amber-950/30 border-b border-amber-900/40 text-amber-200 text-xs flex items-center gap-2">
+                <span class="text-base">⚠️</span>
+                <span><strong>تنبيه تجاري:</strong> لم يتم تأكيد ما إذا كانت أسعار Kleinanzeigen المعلنة أدناه يومية أم أسبوعية، ولا شرط netto/brutto، ولا عدد ساعات التشغيل المشمولة (Betriebsstunden). كل الأرقام أدناه سيناريوهات حسابية حتى وصول العرض المكتوب.</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-xs sm:text-sm">
+                    <thead class="bg-slate-900 text-slate-300 font-bold border-b border-slate-700">
+                        <tr>
+                            <th class="p-4">الآلة المطلوبة (المواصفات)</th>
+                            <th class="p-4 text-center">Preis MN-Baumaschinen (المعلن)</th>
+                            <th class="p-4 text-center">Marktdurchschnitt Hannover <span class="bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded">Schätzung</span></th>
+                            <th class="p-4 text-center text-amber-400">Ziel-/Partnerpreis KERNX</th>
+                            <th class="p-4 text-center">الخصم والتوفير المستهدف</th>
+                            <th class="p-4">شروط النقل واللوجستيات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700 text-slate-300">
+                        <!-- Machine 1: Bagger 3t + Hammer -->
+                        <tr class="hover:bg-slate-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white text-base">1. Bagger 3,0 Tonnen</div>
+                                <div class="text-xs text-slate-400 mt-0.5">+ Löffelpaket + Stemmhammer / Hydraulikhammer</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-amber-400 font-bold">84,00 € / Tag</div>
+                                <div class="text-[11px] text-slate-400">Monat: 1.008 € – 1.260 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-slate-200">110,00 € / Tag</div>
+                                <div class="text-[11px] text-slate-400">Monat: 1.400 € – 1.650 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono bg-amber-950/20 font-bold text-amber-300">
+                                <div>72,00 € / Tag</div>
+                                <div class="text-[11px] text-amber-400/80">Monat: 864,00 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400 font-bold">
+                                -34.5% vs. Markt
+                            </td>
+                            <td class="p-4 text-xs text-slate-400">
+                                ينقله المؤجر (300 € pauschal ذهاب وإياب لـ Wolfsburg)
+                            </td>
+                        </tr>
+
+                        <!-- Machine 2: Radlader -->
+                        <tr class="hover:bg-slate-750 bg-slate-800/40">
+                            <td class="p-4">
+                                <div class="font-bold text-white text-base">2. Radlader (Kramer 5035 / 3.0t)</div>
+                                <div class="text-xs text-slate-400 mt-0.5">شامل Schaufel + Palettengabel</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-amber-400 font-bold">78,00 € – 84,00 €</div>
+                                <div class="text-[11px] text-slate-400">Monat: 936 € – 1.260 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-slate-200">105,00 € / Tag</div>
+                                <div class="text-[11px] text-slate-400">Monat: 1.350 € – 1.550 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono bg-amber-950/20 font-bold text-amber-300">
+                                <div>68,00 € / Tag</div>
+                                <div class="text-[11px] text-amber-400/80">Monat: 816,00 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400 font-bold">
+                                -35.2% vs. Markt
+                            </td>
+                            <td class="p-4 text-xs text-slate-400">
+                                ينقله المؤجر (300 € pauschal ذهاب وإياب لـ Wolfsburg)
+                            </td>
+                        </tr>
+
+                        <!-- Machine 3: Rüttelplatte -->
+                        <tr class="hover:bg-slate-750">
+                            <td class="p-4">
+                                <div class="font-bold text-white text-base">3. Rüttelplatte (دك الممشى والطريق)</div>
+                                <div class="text-xs text-slate-400 mt-0.5">وزن تشغيلي متوسط (ca. 100-200 kg)</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <span class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded font-bold">auf Anfrage</span>
+                                <div class="text-[11px] text-slate-400 mt-0.5">تقدير شفهي: 25,00 €/Tag</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-slate-200">35,00 € / Tag</div>
+                                <div class="text-[11px] text-slate-400">Monat: 420 € – 500 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono bg-amber-950/20 font-bold text-amber-300">
+                                <div>20,00 € / Tag</div>
+                                <div class="text-[11px] text-amber-400/80">Monat: 240,00 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400 font-bold">
+                                -42.8% vs. Markt
+                            </td>
+                            <td class="p-4 text-xs text-emerald-400 font-semibold">
+                                🚚 تنقله KERNX BAU بنفسها (التكلفة = 0 €)
+                            </td>
+                        </tr>
+
+                        <!-- Machine 4: Stampfer -->
+                        <tr class="hover:bg-slate-750 bg-slate-800/40">
+                            <td class="p-4">
+                                <div class="font-bold text-white text-base">4. Stampfer (Grabenstampfer)</div>
+                                <div class="text-xs text-slate-400 mt-0.5">دك الخنادق الضيقة بعد تمديد الألياف</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <span class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded font-bold">auf Anfrage</span>
+                                <div class="text-[11px] text-slate-400 mt-0.5">تقدير شفهي: 20,00 €/Tag</div>
+                            </td>
+                            <td class="p-4 text-center font-mono">
+                                <div class="text-slate-200">30,00 € / Tag</div>
+                                <div class="text-[11px] text-slate-400">Monat: 360 € – 450 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono bg-amber-950/20 font-bold text-amber-300">
+                                <div>16,00 € / Tag</div>
+                                <div class="text-[11px] text-amber-400/80">Monat: 192,00 €</div>
+                            </td>
+                            <td class="p-4 text-center font-mono text-emerald-400 font-bold">
+                                -46.6% vs. Markt
+                            </td>
+                            <td class="p-4 text-xs text-emerald-400 font-semibold">
+                                🚚 تنقله KERNX BAU بنفسها (التكلفة = 0 €)
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 bg-slate-900 text-xs text-slate-400 border-t border-slate-800 flex flex-wrap justify-between items-center gap-2">
+                <div>
+                    <strong>قاعدة تحويل السعر الأسبوعي والشهري العرفية:</strong> Wochenpreis ≈ Tagespreis × 4,0 | Monatspreis ≈ Tagespreis × 12 (سيناريو متفائل) إلى × 15 (سيناريو متحفظ).
+                </div>
+                <div>
+                    <strong>السعر المستهدف KERNX:</strong> يمثل Monatspreis MN minus 10% Paketrabatt (4 Geräte) + تثبيت تكلفة النقل.
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Rental Cost & Deckungsbeitrag Calculator -->
+        <section id="calculator" class="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl p-6 border border-slate-700 shadow-xl">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="text-center border-b border-slate-800 pb-4">
+                    <span class="bg-amber-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase">أداة محاكاة التكاليف الحية</span>
+                    <h2 class="text-xl font-bold text-white mt-2">حاسبة التكلفة الإجمالية وهامش الربح للمتر (Mietkosten & DB Rechner)</h2>
+                    <p class="text-xs text-slate-400 mt-1">تعديل المدة، خيارات النقل، والملحقات لحساب الفاتورة الإجمالية والتكلفة للمتر الطولي</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Controls Column 1 -->
+                    <div class="space-y-4 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase">1. آلات وتجهيزات الطقم</h3>
+                        
+                        <label class="flex items-center justify-between text-xs text-slate-200 cursor-pointer">
+                            <span>Bagger 3.0t (84 €/Tag)</span>
+                            <input type="checkbox" id="calc-bagger" checked onchange="calculateProjectTotal()" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0">
+                        </label>
+
+                        <label class="flex items-center justify-between text-xs text-slate-200 cursor-pointer">
+                            <span>Radlader Kramer (78 €/Tag)</span>
+                            <input type="checkbox" id="calc-radlader" checked onchange="calculateProjectTotal()" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0">
+                        </label>
+
+                        <label class="flex items-center justify-between text-xs text-slate-200 cursor-pointer">
+                            <span>Rüttelplatte (25 €/Tag)</span>
+                            <input type="checkbox" id="calc-ruettel" checked onchange="calculateProjectTotal()" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0">
+                        </label>
+
+                        <label class="flex items-center justify-between text-xs text-slate-200 cursor-pointer">
+                            <span>Grabenstampfer (20 €/Tag)</span>
+                            <input type="checkbox" id="calc-stampfer" checked onchange="calculateProjectTotal()" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0">
+                        </label>
+
+                        <div class="pt-2 border-t border-slate-700/60">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">إضافة Stemmhammer للـ Bagger:</label>
+                            <select id="calc-hammer" onchange="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white">
+                                <option value="0">بدون مفرمة هيدروليكية (0 €)</option>
+                                <option value="66" selected>إضافة Stemmhammer المعلن (66 €/Tag)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Controls Column 2 -->
+                    <div class="space-y-4 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase">2. المدة والنقل والتأمين</h3>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">مدة المشروع بالأنظمة:</label>
+                            <select id="calc-duration-type" onchange="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white">
+                                <option value="month-12" selected>شهر واحد (12 يوم تشغيلي = خصم شهري)</option>
+                                <option value="month-15">شهر واحد (15 يوم تشغيلي = متحفظ)</option>
+                                <option value="days-20">20 يوم تشغيل مباشر</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">خصم الحزمة المخطط التفاوض عليه:</label>
+                            <select id="calc-discount" onchange="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white">
+                                <option value="0">بدون خصم (أسعار قائمة المعلنة)</option>
+                                <option value="10" selected>خصم طقم 4 آلات (-10%)</option>
+                                <option value="15">خصم شراكة مستمرة (-15%)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">رسوم النقل (Bagger + Radlader):</label>
+                            <select id="calc-transport" onchange="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white">
+                                <option value="600" selected>600 € pauschal (300€ لكل آلة)</option>
+                                <option value="500">500 € pauschal (سعر تفاوضي تخفيض 100€)</option>
+                                <option value="0">0 € (KERNX ينقل بنفسه عبر شاحنة خاصة)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">تأمين المعدات ضد الكسر والسرقة (ABVB):</label>
+                            <select id="calc-insurance" onchange="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white">
+                                <option value="0">مشمول بالنظام / بدون إضافة extra (0 €)</option>
+                                <option value="10">تأمين إضافي 10% من قيمة الإيجار</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Controls Column 3 -->
+                    <div class="space-y-4 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-amber-400 uppercase">3. معدل الإنتاجية اليومية</h3>
+                            <div class="mt-3">
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">إنتاجية فرقة الحفر (m/Tag):</label>
+                                <input type="number" id="calc-performance" value="40" min="10" max="120" oninput="calculateProjectTotal()" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-amber-400 font-mono font-bold">
+                                <p class="text-[11px] text-slate-400 mt-1">الإنتاجية المعتادة في أحياء Wolfsburg: 35-50m/Tag</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>إجمالي الإيجار الصافي (Netto):</span>
+                                <span class="font-mono text-white font-bold" id="res-netto">0,00 €</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>ضريبة المبيعات MwSt (19%):</span>
+                                <span class="font-mono text-slate-300" id="res-vat">0,00 €</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400 border-t border-slate-800 pt-1">
+                                <span>الإجمالي النهائي الشامل (Brutto):</span>
+                                <span class="font-mono text-amber-400 font-bold" id="res-brutto">0,00 €</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator Final Metric Result Output Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-500/10 border border-amber-500/30 p-5 rounded-xl">
+                    <div class="text-center md:text-right">
+                        <div class="text-xs text-slate-400">التكلفة التشغيلية اليومية للآلات (Tagessatz):</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono mt-1" id="res-daily-rate">0,00 € / Tag</div>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <div class="text-xs text-slate-400">خصم الآلات من سعر المتر (14,80 €/m):</div>
+                        <div class="text-2xl font-black text-sky-400 font-mono mt-1" id="res-cost-meter">0,00 € / m</div>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <div class="text-xs text-slate-400">المتبقي الصافي للعمالة والربح (Rest-DB):</div>
+                        <div class="text-2xl font-black text-emerald-400 font-mono mt-1" id="res-rest-db">0,00 € / m</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytical Visualizations Section (3 Required Chart.js Graphs) -->
+        <section class="space-y-6">
+            <div class="border-b border-slate-800 pb-3">
+                <h2 class="text-lg font-bold text-white">التحليل البياني والرسوم البيانية التفاعلية (Data Visualizations)</h2>
+                <p class="text-xs text-slate-400">مقارنة بصرية للأسعار والتوزيع الهيكلي لتكاليف مشروع Wolfsburg</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart 1: Price Comparison Bar Chart -->
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">1. مقارنة تكلفة الإيجار الشهري للآلات الأربع (€)</h3>
+                        <p class="text-xs text-slate-400 mb-4">عرض الفرق بين أسعار المعلن ومعدل السوق وهدف KERNX BAU</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartPriceComparison"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 bg-slate-900/60 p-3 rounded-lg border border-slate-700">
+                        <strong>تحليل المستشار:</strong> توفر أسعار MN-Baumaschinen المعلنة حوالي 28% مقارنة بأسعار السوق السائدة في هانوفر، ويمكن زيادة التوفير إلى 36% عند مفاوضة حزمة الشراكة.
+                    </p>
+                </div>
+
+                <!-- Chart 2: Cost Structure Breakdown Donut -->
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-white text-sm">2. توزيع عناصر الفاتورة الشهرية لمشروع Wolfsburg</h3>
+                        <p class="text-xs text-slate-400 mb-4">النسب المئوية بين إيجار الأساسي للنقل والملحقات الهيدروليكية</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartCostStructure"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 bg-slate-900/60 p-3 rounded-lg border border-slate-700">
+                        <strong>ملاحظة النقل:</strong> يمثل النقل لـ Wolfsburg حوالي 18% من إجمالي ميزانية الآلات الشهرية، مما يجعل التفاوض على النقل المقطوع أمراً جوهرياً.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chart 3: Productivity Line Curve -->
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 class="font-bold text-white text-sm mb-1">3. منحنى تأثير معدل الحفر اليومي (m/Tag) على حصة الآلات من المتر (€/m)</h3>
+                <p class="text-xs text-slate-400 mb-4">يوضح كيفية انخفاض تكلفة المتر المباشرة مع زيادة سرعة إنجاز فرقة الحفر</p>
+                <div class="chart-container" style="max-width: 900px; height: 320px;">
+                    <canvas id="chartProductivityCurve"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Primary Supplier Dossier & Listings Matrix -->
+        <section class="space-y-6">
+            <div class="border-b border-slate-800 pb-3 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-white">ملف المورّد الأساسي وسجل الإعلانات المباشرة (MN-Baumaschinen)</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">30179 Hannover-Nord · Gewerblicher Nutzer منذ 18.08.2022 · 74 Follower</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-md border border-emerald-500/30">TOP Zufriedenheit</span>
+                    <span class="bg-sky-500/20 text-sky-400 text-xs font-bold px-2.5 py-1 rounded-md border border-sky-500/30">Sehr freundlich</span>
+                    <span class="bg-indigo-500/20 text-indigo-400 text-xs font-bold px-2.5 py-1 rounded-md border border-indigo-500/30">Sehr zuverlässig</span>
+                </div>
+            </div>
+
+            <!-- Supplier Profile Card -->
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <div class="text-xs font-bold text-amber-400 uppercase">قنوات الاتصال والتواصل</div>
+                    <h3 class="text-base font-bold text-white mt-1">MN-Baumaschinen Vermietung</h3>
+                    <p class="text-xs text-slate-400 mt-2">
+                        📍 الموقع: 30179 Hannover-Nord (قريب من طريق Wolfsburg السريع A2/A39)
+                    </p>
+                    <p class="text-xs text-slate-400 mt-1">
+                        ⏱️ زمن الرد السائد: <span class="text-white font-semibold">خلال 24 ساعة</span>
+                    </p>
+                </div>
+
+                <div>
+                    <div class="text-xs font-bold text-amber-400 uppercase">ملاحظة القناة التفاوضية</div>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                        ⚠️ <strong class="text-amber-300">لا يملك حساب WhatsApp على الرقم المعلن.</strong>
+                        يجب إجراء التواصل والمتابعة حصرياً عبر رسائل منصة Kleinanzeigen الرسمية أو عبر المكالمات الهاتفية المباشرة.
+                    </p>
+                </div>
+
+                <div class="flex flex-col justify-center items-end space-y-2">
+                    <button onclick="openModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl transition shadow text-center">
+                        📩 فتح نموذج Nachfass-Anfrage
+                    </button>
+                    <a href="https://www.kleinanzeigen.de" target="_blank" rel="noopener" class="w-full bg-slate-900 hover:bg-slate-950 text-slate-300 border border-slate-700 font-semibold text-xs py-2 px-4 rounded-xl transition text-center">
+                        🔗 فتح صفحة Kleinanzeigen العامة
+                    </a>
+                </div>
+            </div>
+
+            <!-- Live Kleinanzeigen Listings Table (13 Items) -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-md">
+                <div class="p-4 bg-slate-900 border-b border-slate-700 flex flex-wrap justify-between items-center gap-4">
+                    <h3 class="font-bold text-white text-sm">جدول جميع إعلاناته الفعلية على المنصة (13 إعلاناً حياً)</h3>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="table-search" onkeyup="filterListingsTable()" placeholder="بحث في الإعلانات..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none focus:border-amber-500">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs" id="listings-table">
+                        <thead class="bg-slate-950 text-slate-400 font-bold border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">#</th>
+                                <th class="p-3">العنوان الرسمي للإعلان (Anzeige)</th>
+                                <th class="p-3 text-center">السعر المعلن</th>
+                                <th class="p-3 text-center">تاريخ النشر</th>
+                                <th class="p-3 text-center">الرابط المباشر</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/60 text-slate-300">
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">1</td>
+                                <td class="p-3 font-semibold text-white">Radlader Kramer 5035 Mieten Vermietung Baumaschinen</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">78 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">heute</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-kramer-5035-mieten-vermietung-baumaschinen/2892931196-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">2</td>
+                                <td class="p-3 font-semibold text-white">Stemmhammer Abbruchhammer Bagger Baumaschinen Vermietung Mieten</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">66 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">gestern</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/stemmhammer-abbruchhammer-bagger-baumaschinen-vermietung-mieten/2948123033-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">3</td>
+                                <td class="p-3 font-semibold text-white">Mietpark Hannover Bagger Radlader Baumaschinen Mieten Vermietung</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">77 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">02.09.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/mietpark-hannover-bagger-radlader-baumaschinen-mieten-vermietung/2811703188-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">4</td>
+                                <td class="p-3 font-semibold text-white">Minibagger Bagger 6,0 Tonnen Vermietung Verleih Mieten</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">130 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">29.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/minibagger-bagger-6-0-tonnen-vermietung-verleih-mieten/2915593917-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">5</td>
+                                <td class="p-3 font-semibold text-white">Minibagger Bagger 1,8 Tonnen Mieten Verleih Vermietung</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">78 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">22.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/minibagger-bagger-1-8-tonnen-mieten-verleih-vermietung/2851408827-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750 bg-amber-950/20">
+                                <td class="p-3 font-mono">6</td>
+                                <td class="p-3 font-bold text-amber-300">Minibagger Bagger 3,0 Tonnen Vermietung Verleih Mieten ⭐ [مطلوب للمشروع]</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">84 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">19.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/minibagger-bagger-3-0-tonnen-vermietung-verleih-mieten/2875957389-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750 bg-amber-950/20">
+                                <td class="p-3 font-mono">7</td>
+                                <td class="p-3 font-bold text-amber-300">Radlader 3,0 Tonnen Mieten Baumaschinen Vermietung Verleih ⭐ [مطلوب للمشروع]</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">84 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">15.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-3-0-tonnen-mieten-baumaschinen-vermietung-verleih-mieten/2901600482-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">8</td>
+                                <td class="p-3 font-semibold text-white">Radlader Kubota Baumaschinen Vermietung Mieten Verleih Bagger</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">84 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">10.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-kubota-baumaschinen-vermietung-mieten-verleih-bagger/3005094471-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">9</td>
+                                <td class="p-3 font-semibold text-white">Minibagger Kubota Baumaschinen Bagger Vermietung Verleih Mieten</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">78 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">21.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/minibagger-kubota-baumaschinen-bagger-vermietung-verleih-mieten/2960446937-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">10</td>
+                                <td class="p-3 font-semibold text-white">Microbagger Minibagger Bagger Vermietung Verleih Mieten Radlader</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">84 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">21.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/microbagger-minibagger-bagger-vermietung-verleih-mieten-radlader/2960413158-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">11</td>
+                                <td class="p-3 font-semibold text-white">Baumaschinen Minibagger Bagger Mieten Vermietung Verleih Radlader</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">78 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">26.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/baumaschinen-minibagger-bagger-mieten-vermietung-verleih-radlader/2992550736-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">12</td>
+                                <td class="p-3 font-semibold text-white">Bauzaun / Mobilzäune Mieten Vermietung Verleih</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">12 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">22.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/bauzaun-mieten-vermietung-mobilzaeune-verleih-bauzaeune/2879765608-239-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-750">
+                                <td class="p-3 font-mono">13</td>
+                                <td class="p-3 font-semibold text-white">Winterdienst Radlader Mieten Vermietung Schneeräumfahrzeug</td>
+                                <td class="p-3 text-center font-mono font-bold text-amber-400">1.670 €</td>
+                                <td class="p-3 text-center font-mono text-slate-400">27.08.2026</td>
+                                <td class="p-3 text-center">
+                                    <a href="https://www.kleinanzeigen.de/s-anzeige/winterdienst-radlader-mieten-vermietung-schneeraeumfahrzeug/2884362348-276-3166" target="_blank" rel="noopener" class="text-sky-400 hover:underline">فتح الإعلان 🔗</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spare Parts Section (Ersatzteile) -->
+        <section class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700 shadow-md">
+            <div class="mb-4">
+                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold px-2.5 py-0.5 rounded">قسم ملحق</span>
+                <h2 class="text-base font-bold text-white mt-1">قطع الغيار المعروضة لدى الموّرد (Ersatzteile Marketplace)</h2>
+                <p class="text-xs text-slate-400">يمكن الاستفادة منها لتغطية أي صيانة طارئة لآلات KERNX BAU الخاصة خلال المشروع</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <a href="https://www.kleinanzeigen.de/s-anzeige/gummiketten-kubota-kxo-1-8-bagger-baumaschinen-minibagger-teile/2992609044-276-3166" target="_blank" rel="noopener" class="bg-slate-900 p-4 rounded-xl border border-slate-700 hover:border-amber-500 transition block">
+                    <div class="font-bold text-white">Gummikette Kubota KX 1.8</div>
+                    <div class="text-slate-400 text-[11px] mt-1">المقاس: (230×48×70)</div>
+                    <div class="text-amber-400 font-mono font-bold mt-2">245,00 € netto <span class="text-slate-400 text-[10px]">(291,55 € brutto)</span></div>
+                </a>
+
+                <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-kramer-5035-tuerscheibe-recht-oben-baumaschinen-scheiben/2969484782-276-3166" target="_blank" rel="noopener" class="bg-slate-900 p-4 rounded-xl border border-slate-700 hover:border-amber-500 transition block">
+                    <div class="font-bold text-white">Kramer 5035 Türscheibe rechts oben</div>
+                    <div class="text-slate-400 text-[11px] mt-1">زجاج باب يمين علوي</div>
+                    <div class="text-amber-400 font-mono font-bold mt-2">155,00 €</div>
+                </a>
+
+                <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-kramer-5035-tuerscheibe-links-baumaschinen-scheiben/2884546145-276-3166" target="_blank" rel="noopener" class="bg-slate-900 p-4 rounded-xl border border-slate-700 hover:border-amber-500 transition block">
+                    <div class="font-bold text-white">Kramer 5035 Türscheibe links</div>
+                    <div class="text-slate-400 text-[11px] mt-1">زجاج باب يسار سفلي</div>
+                    <div class="text-amber-400 font-mono font-bold mt-2">137,00 €</div>
+                </a>
+
+                <a href="https://www.kleinanzeigen.de/s-anzeige/radlader-kramer-5035-tuerscheibe-links-oben-baumaschinen-scheiben/2922480823-276-3166" target="_blank" rel="noopener" class="bg-slate-900 p-4 rounded-xl border border-slate-700 hover:border-amber-500 transition block">
+                    <div class="font-bold text-white">Kramer 5035 Türscheibe links oben</div>
+                    <div class="text-slate-400 text-[11px] mt-1">زجاج باب يسار علوي</div>
+                    <div class="text-amber-400 font-mono font-bold mt-2">143,00 €</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Final Action Matrix & Follow-up Checklist -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Checklist Card -->
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 flex flex-col justify-between space-y-4">
+                <div>
+                    <h3 class="font-bold text-white text-base mb-3">قائمة تدقيق شروط عقد التأجير العادل (Mietvertrag Checklist)</h3>
+                    <ul class="space-y-2.5 text-xs text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-400 font-bold">☑</span>
+                            <span><strong>تأكيد الأسعار اليومية/الاشهرية:</strong> التأكد من أن السعر المكتوب يغطي الإيجار الشهري المقطوع.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-400 font-bold">☑</span>
+                            <span><strong>ساعات التشغيل (Betriebsstunden):</strong> تثبيت حد أدنى 8 ساعات عمل يومياً دون رسوم إضافية.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-400 font-bold">☑</span>
+                            <span><strong>تكلفة النقل المقطوعة (Transportpauschale):</strong> تثبيت مبلغ 300 € للآلة ذهاب وإياب لـ Wolfsburg.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-400 font-bold">☑</span>
+                            <span><strong>الملحقات الهيدروليكية:</strong> التأكد من تضمين Löffelpaket و Stemmhammer مع الحفارة 3t.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-400">
+                    💡 <strong>توصية قرار الاستئجار:</strong> في حال الموافقة على حزمة 864€ للحفارة و816€ للـ Radlader مع نقل مقطوع، يرتفع هامش ربح المتر لـ KERNX BAU إلى أكثر من <strong class="text-emerald-400">11.80 €/m</strong>.
+                </div>
+            </div>
+
+            <!-- Follow-up Request Quick Trigger Box -->
+            <div class="bg-gradient-to-br from-amber-950/40 via-slate-800 to-slate-800 p-6 rounded-2xl border border-amber-500/30 flex flex-col justify-between">
+                <div>
+                    <span class="bg-amber-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded">متابعة فورية</span>
+                    <h3 class="text-lg font-bold text-white mt-1">إرسال Nachfass-Anfrage للمورّد MN-Baumaschinen</h3>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                        نظراً لعدم وصول عرض أسعار مكتوب حتى الآن، استخدم الزر أدناه للوصول إلى خطاب المتابعة المجهز بالألمانية للحصول على العرض المكتوب وتأكيد الحجز لموقع Wolfsburg.
+                    </p>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex flex-wrap gap-3">
+                    <button onclick="openModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs py-3 px-6 rounded-xl transition shadow flex items-center gap-2">
+                        <span>📩</span> عرض وقراءة خطاب المتابعة المكتوب (Anfrage)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Dialog: Nachfass-Anfrage Template -->
+    <div id="nachfass-modal" class="fixed inset-0 modal-backdrop hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base">خطاب متابعة طلب العرض (Nachfass-Anfrage per Kleinanzeigen)</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-300">
+                يمكنك نسخ النص الألماني أدناه وإرساله مباشرة عبر رسائل منصة Kleinanzeigen للمورّد MN-Baumaschinen:
+            </p>
+
+            <textarea id="modal-text" readonly class="w-full h-64 bg-slate-950 text-amber-300 font-mono text-xs p-4 rounded-xl border border-slate-800 focus:outline-none leading-relaxed" dir="ltr">
+Anfrage: Maschinenpaket für Kabeltiefbauprojekt in Wolfsburg (Start 01.10.)
+
+Sehr geehrte Damen und Herren (MN-Baumaschinen),
+
+wir nehmen Bezug auf unsere bisherige Anfrage bezüglich des Maschinenpakets für unser Tiefbauprojekt in Wolfsburg (Beginn: 01.10.2026, geplante Dauer: ca. 1 Monat).
+
+Da uns bisher noch kein schriftliches Angebot vorliegt, möchten wir verbindlich nachfassen und um Bestätigung der Konditionen für folgende Gerätekombination bitten:
+
+1. Minibagger 3,0 Tonnen (inkl. Löffelpaket + Stemmhammer/Hydraulikhammer)
+2. Radlader (z.B. Kramer 5035 / 3.0t inkl. Schaufel & Palettengabel)
+3. Rüttelplatte (ca. 100-200 kg)
+4. Grabenstampfer
+
+Bitte bestätigen Sie uns kurzfristig:
+- Den Paket-Monatspreis (netto) für alle 4 Geräte.
+- Die An- und Abfahrtspauschale für Bagger & Radlader nach Wolfsburg (ca. 90 km pro Strecke).
+- Die enthaltenen Betriebsstunden pro Tag/Monat.
+
+Vielen Dank im Voraus für Ihre schnelle Rückmeldung.
+
+Mit freundlichen Grüßen,
+
+KERNX BAU UG (haftungsbeschränkt)
+Deisterstraße 30, 30449 Hannover
+E-Mail: contact@kernxbau.de | Tel: +49 176 84786729
+            </textarea>
+
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="copyModalTemplate()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-2">
+                    <span>📋</span> نسخ النص الألماني
+                </button>
+                <button onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-4 py-2 rounded-xl transition">
+                    إغلاق النافذة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Information -->
+    <footer class="bg-slate-950 text-slate-500 text-xs py-8 mt-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p><strong>KERNX BAU UG (haftungsbeschränkt)</strong> · Deisterstraße 30, 30449 Hannover · HRB 231210</p>
+            <p class="text-slate-600">مركز قرار تأجير الآلات والمعدات لمشروع FTTH Wolfsburg 2026. جميع الحسابات مبنية على أسعار الوحدة وقواعد NU-LV الرسمية.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic & Chart.js Config -->
+    <script>
+        // Modal Controls
+        function openModal() {
+            document.getElementById('nachfass-modal').classList.remove('hidden');
+            document.getElementById('nachfass-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('nachfass-modal').classList.remove('flex');
+            document.getElementById('nachfass-modal').classList.add('hidden');
+        }
+
+        function copyModalTemplate() {
+            const area = document.getElementById('modal-text');
+            area.select();
+            document.execCommand('copy');
+            alert('تم نسخ نص الخطاب بنجاح! يمكنك الآن لصقه في Kleinanzeigen.');
+        }
+
+        // Table Filter Logic
+        function filterListingsTable() {
+            const input = document.getElementById('table-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#listings-table tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        // Dynamic Metric Header Calculation
+        function updateMeterMetric() {
+            const performance = parseFloat(document.getElementById('meter-performance').value) || 40;
+            const dailyCost = 125.00; // Estimated Daily Fleet Cost
+            const baseLVRate = 14.80; // Cable Trench LV Unit Rate
+
+            const costPerMeter = dailyCost / performance;
+            const remainingDB = baseLVRate - costPerMeter;
+
+            document.getElementById('metric-daily-cost').innerText = dailyCost.toFixed(2) + ' € / Tag';
+            document.getElementById('metric-cost-per-meter').innerText = costPerMeter.toFixed(2) + ' € / m';
+            document.getElementById('metric-remaining-db').innerText = remainingDB.toFixed(2) + ' € / m';
+        }
+
+        // Project Interactive Cost & Deckungsbeitrag Calculator Logic
+        function calculateProjectTotal() {
+            let dailyTotal = 0;
+
+            if (document.getElementById('calc-bagger').checked) dailyTotal += 84;
+            if (document.getElementById('calc-radlader').checked) dailyTotal += 78;
+            if (document.getElementById('calc-ruettel').checked) dailyTotal += 25;
+            if (document.getElementById('calc-stampfer').checked) dailyTotal += 20;
+
+            const hammerCost = parseFloat(document.getElementById('calc-hammer').value) || 0;
+            dailyTotal += hammerCost;
+
+            const durationType = document.getElementById('calc-duration-type').value;
+            let daysFactor = 12; // default optimistic monthly factor
+            if (durationType === 'month-15') daysFactor = 15;
+            if (durationType === 'days-20') daysFactor = 20;
+
+            let grossBaseRent = dailyTotal * daysFactor;
+
+            const discount = parseFloat(document.getElementById('calc-discount').value) || 0;
+            grossBaseRent = grossBaseRent * (1 - (discount / 100));
+
+            const transport = parseFloat(document.getElementById('calc-transport').value) || 0;
+            const insurancePct = parseFloat(document.getElementById('calc-insurance').value) || 0;
+
+            const insuranceCost = grossBaseRent * (insurancePct / 100);
+
+            const totalNetto = grossBaseRent + transport + insuranceCost;
+            const vat = totalNetto * 0.19;
+            const totalBrutto = totalNetto + vat;
+
+            const effectiveDailyRate = totalNetto / daysFactor;
+
+            const performance = parseFloat(document.getElementById('calc-performance').value) || 40;
+            const costPerMeter = effectiveDailyRate / performance;
+            const remainingDB = 14.80 - costPerMeter;
+
+            document.getElementById('res-netto').innerText = totalNetto.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('res-vat').innerText = vat.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('res-brutto').innerText = totalBrutto.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+            document.getElementById('res-daily-rate').innerText = effectiveDailyRate.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € / Tag';
+            document.getElementById('res-cost-meter').innerText = costPerMeter.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € / m';
+            document.getElementById('res-rest-db').innerText = remainingDB.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € / m';
+        }
+
+        // Helper function for Chart label wrapping (>16 chars)
+        function wrapLabel(str) {
+            if (typeof str !== 'string') return str;
+            if (str.length <= 16) return str;
+            const words = str.split(' ');
+            let lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + word).length > 16) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            });
+            if (currentLine.trim().length > 0) lines.push(currentLine.trim());
+            return lines;
+        }
+
+        // Chart.js Tooltip configuration object
+        const tooltipConfig = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            } else {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Initialize Application & Chart.js Instances
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMeterMetric();
+            calculateProjectTotal();
+
+            // Chart 1: Price Comparison Bar Chart
+            const ctx1 = document.getElementById('chartPriceComparison').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        wrapLabel('Bagger 3.0t'),
+                        wrapLabel('Radlader Kramer'),
+                        wrapLabel('Rüttelplatte'),
+                        wrapLabel('Grabenstampfer')
+                    ],
+                    datasets: [
+                        {
+                            label: 'MN-Baumaschinen (€)',
+                            data: [1008, 936, 300, 240],
+                            backgroundColor: '#f59e0b'
+                        },
+                        {
+                            label: 'متوسط السوق هانوفر (€)',
+                            data: [1400, 1350, 420, 360],
+                            backgroundColor: '#64748b'
+                        },
+                        {
+                            label: 'هدف KERNX BAU (€)',
+                            data: [864, 816, 240, 192],
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: tooltipConfig.plugins.tooltip,
+                        legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#cbd5e1' } },
+                        y: { beginAtZero: true, ticks: { color: '#cbd5e1' }, title: { display: true, text: 'اليورو (€/Monat)', color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // Chart 2: Cost Structure Donut
+            const ctx2 = document.getElementById('chartCostStructure').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        wrapLabel('إيجار Bagger الأساسي'),
+                        wrapLabel('إيجار Radlader'),
+                        wrapLabel('رسوم النقل Wolfsburg'),
+                        wrapLabel('Stemmhammer ملحق'),
+                        wrapLabel('Rüttelplatte & Stampfer')
+                    ],
+                    datasets: [{
+                        data: [1008, 936, 600, 400, 480],
+                        backgroundColor: ['#f59e0b', '#0284c7', '#d97706', '#6366f1', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: tooltipConfig.plugins.tooltip,
+                        legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+
+            // Chart 3: Productivity Curve Line Chart
+            const ctx3 = document.getElementById('chartProductivityCurve').getContext('2d');
+            new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: ['10 m/Tag', '20 m/Tag', '30 m/Tag', '40 m/Tag', '50 m/Tag', '60 m/Tag', '80 m/Tag'],
+                    datasets: [
+                        {
+                            label: 'تكلفة الآلات لكل متر (€/m)',
+                            data: [12.50, 6.25, 4.17, 3.13, 2.50, 2.08, 1.56],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'سعر الوحدة بالـ LV (14,80 €/m)',
+                            data: [14.80, 14.80, 14.80, 14.80, 14.80, 14.80, 14.80],
+                            borderColor: '#ef4444',
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: tooltipConfig.plugins.tooltip,
+                        legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#cbd5e1' } },
+                        y: { beginAtZero: true, ticks: { color: '#cbd5e1' }, title: { display: true, text: 'اليورو لكل متر (€/m)', color: '#94a3b8' } }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
